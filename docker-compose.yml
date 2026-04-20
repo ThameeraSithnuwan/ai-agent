@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./services/api
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  web:
+    build: ./services/web
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - API_URL=http://api:3001
+    depends_on:
+      api:
+        condition: service_healthy
